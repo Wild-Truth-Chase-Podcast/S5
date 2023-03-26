@@ -2,8 +2,12 @@ import requests
 import pandas as pd
 import matplotlib.pyplot as plt
 
+bank = "SILICON VALLEY BANK"
+fields = "NAME,STNAME,REPYEAR,RISDATE,REPDTE,ASSET,LIAB"
+limit = 200
 
-url = 'https://banks.data.fdic.gov/api/financials?filters=NAME:"SILICON VALLEY BANK"&fields=NAME,STNAME,REPYEAR,RISDATE,REPDTE,ASSET,LIAB&limit=200'
+root = 'https://banks.data.fdic.gov/api/financials'
+url = f'{root}?filters=NAME:"{bank}"&fields={fields}&limit={limit}'
 
 
 response = requests.get(url)
@@ -28,6 +32,6 @@ plt.legend(loc="upper right")
 
 plt.figure()
 # plt.bar(df.index, df["DIFF"])
-plt.bar(df.index, (df["DIFF"] / df["ASSET"])*100)
+plt.bar(df.index, (df["DIFF"] / df["ASSET"]) * 100)
 
 plt.show()
