@@ -48,6 +48,12 @@ df["FAILDATE"] = pd.to_datetime(df["FAILDATE"])
 grouped = df.groupby(pd.Grouper(key="FAILDATE", axis=0, freq="3M"))
 monthly_counts = grouped.count()
 print(monthly_counts)
+print("Since records began")
+print(monthly_counts["ID"].describe())
+recent_counts = monthly_counts["2000-01-01":]
+print("Since 2000")
+print(recent_counts["ID"].describe())
+
 # plot
 fig = px.bar(monthly_counts, y="ID")
 fig.show()
