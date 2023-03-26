@@ -5,7 +5,8 @@ from loguru import logger
 from pathlib import Path
 import requests
 import pandas as pd
-import matplotlib.pyplot as plt
+import plotly.express as px
+
 
 def get_data():
     """Get failure data"""
@@ -18,8 +19,8 @@ def get_data():
 
     root = "https://banks.data.fdic.gov/api/failures"
     url = f'{root}?filters=FAILYR:["{fromyr}" TO "{toyr}"]&fields={fields}'
-    url += '&sort_by=FAILDATE&sort_order=DESC'
-    url += f'&limit={limit}&offset=0'
+    url += "&sort_by=FAILDATE&sort_order=DESC"
+    url += f"&limit={limit}&offset=0"
     # url += '&total_fields={totals}&subtotal_by=RESTYPE'
     # url += '&agg_by=FAILYR&agg_term_fields=RESTYPE&agg_sum_fields={agg_sum_fields}&agg_limit=120'
     logger.info(url)
@@ -29,6 +30,7 @@ def get_data():
     results = [x["data"] for x in results["data"]]
     df = pd.DataFrame.from_records(results)
     return df.sort_values("FAILYR")
+
 
 csv_path = Path("FDIC", "data", "failures.csv")
 overwrite = False
@@ -41,6 +43,11 @@ else:
     df = pd.read_csv(csv_path)
 
 print(df)
-# plt.plot(df["FAILYR"], df["count"])
-# plt.xticks(rotation = 45)
-# plt.show()
+# do some grouping
+df["FAILDATE"] = pd.to_datetime(df["FAILDATE"])
+grouped = df.groupby(pd.Grouper(key="FAILDATE", axis=0, freq="3M"))
+monthly_counts = grouped.count()
+print(monthly_counts)
+# plot
+fig = px.bar(monthly_counts, y="ID")
+fig.show()
